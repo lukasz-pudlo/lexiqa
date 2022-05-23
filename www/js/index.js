@@ -28,6 +28,20 @@ function onDeviceReady() {
 
 }
 
+const indexedDB =
+  window.indexedDB ||
+  window.mozIndexedDB ||
+  window.webkitIndexedDB ||
+  window.msIndexedDB ||
+  window.shimIndexedDB;
+
+const request = indexedDB.open("LexiqaDatabase", 1);
+
+request.onerror = function (event) {
+    console.error("An error occurred with IndexedDB");
+    console.error(event);
+  };
+
 function divideText() {
     // Initialise an empty list of words
     var wordList = [];
