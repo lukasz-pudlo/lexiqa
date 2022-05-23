@@ -23,5 +23,8 @@
     "platforms": [
       "browser"
     ]
+  },
+  "dependencies": {
+    "googletrans": "^1.0.4"
   }
 }

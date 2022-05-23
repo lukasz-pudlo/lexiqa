@@ -19,11 +19,39 @@
 
 // Wait for the deviceready event before using any of Cordova's device APIs.
 // See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
+
+// import tr from "googletrans";
+
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady() {
-    // Cordova is now initialized. Have fun!
 
-    console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    document.getElementById('deviceready').classList.add('ready');
+}
+// Initialise 
+
+function divideText() {
+    var wordList = [];
+    // Get the value entered into the textbox
+    var enteredText = $("#entered-text").val();
+    // Split the entered text on empty spaces between words
+    var splitText = enteredText.split(' ');
+    // Push each word into the wordList
+    splitText.forEach((word) => {
+        wordList.push(word);
+    });
+    return wordList;
+}
+
+function addWordsFromWordList() {
+    var wordList = divideText();
+    var wrapperDiv = document.getElementById("wrapperDiv");
+    // Initialise an empty unordered list
+    var unorderedList = document.createElement("ul");
+    wrapperDiv.appendChild(unorderedList);
+    
+    wordList.forEach((word) => {
+        var wordLi = document.createElement("li");
+        wordLi.appendChild(document.createTextNode(`${word}`));
+        unorderedList.appendChild(wordLi);
+    });
 }
