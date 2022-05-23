@@ -27,9 +27,9 @@ document.addEventListener('deviceready', onDeviceReady, false);
 function onDeviceReady() {
 
 }
-// Initialise 
 
 function divideText() {
+    // Initialise an empty list of words
     var wordList = [];
     // Get the value entered into the textbox
     var enteredText = $("#entered-text").val();
@@ -48,7 +48,7 @@ function addWordsFromWordList() {
     // Initialise an empty unordered list
     var unorderedList = document.createElement("ul");
     wrapperDiv.appendChild(unorderedList);
-    
+
     wordList.forEach((word) => {
         var wordLi = document.createElement("li");
         wordLi.appendChild(document.createTextNode(`${word}`));
