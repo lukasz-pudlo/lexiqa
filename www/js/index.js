@@ -28,18 +28,70 @@ function onDeviceReady() {
 
 }
 
+// Initialise the database name independetly of how it is referred in specific browsers
 const indexedDB =
-  window.indexedDB ||
-  window.mozIndexedDB ||
-  window.webkitIndexedDB ||
-  window.msIndexedDB ||
-  window.shimIndexedDB;
+    window.indexedDB ||
+    window.mozIndexedDB ||
+    window.webkitIndexedDB ||
+    window.msIndexedDB ||
+    window.shimIndexedDB;
 
+if (!indexedDB) {
+    console.log("IndexedDB could not be found in this browser.");
+}
+
+//Make an open request to the database version 1. The first parameter is the name of the database and second
+// parameter is the version
 const request = indexedDB.open("LexiqaDatabase", 1);
 
 request.onerror = function (event) {
     console.error("An error occurred with IndexedDB");
     console.error(event);
+};
+
+// Trigger the on upgrade event when a new database is created or a new version of the database is added
+request.onupgradeneeded = function () {
+    //1
+    const db = request.result;
+
+    //2
+    const store = db.createObjectStore("words", { keyPath: "id", autoIncrement: true });
+
+    //3
+    store.createIndex("word_source_meaning", ["word_source"], { unique: false });
+};
+
+request.onsuccess = function () {
+    console.log("Database opened successfully");
+  
+    const db = request.result;
+  
+    // 1
+    const transaction = db.transaction("words", "readwrite");
+  
+    //2
+    const store = transaction.objectStore("words");
+    const word_source_meaning = store.index("word_source");
+  
+    // const idQuery = store.get(4);
+    // const colourQuery = colourIndex.getAll(["Red"]);
+    // const colourMakeQuery = makeModelIndex.get(["Blue", "Honda"]);
+  
+    // 5
+    // idQuery.onsuccess = function () {
+    //   console.log('idQuery', idQuery.result);
+    // };
+    // colourQuery.onsuccess = function () {
+    //   console.log('colourQuery', colourQuery.result);
+    // };
+    // colourMakeQuery.onsuccess = function () {
+    //   console.log('colourMakeQuery', colourMakeQuery.result);
+    // };
+  
+    // 6
+    transaction.oncomplete = function () {
+      db.close();
+    };
   };
 
 function divideText() {
@@ -67,5 +119,6 @@ function addWordsFromWordList() {
         var wordLi = document.createElement("li");
         wordLi.appendChild(document.createTextNode(`${word}`));
         unorderedList.appendChild(wordLi);
+        store.put({ word_source: word, word_target: "translation" });
     });
 }
