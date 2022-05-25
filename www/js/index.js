@@ -28,6 +28,9 @@ function onDeviceReady() {
 
 }
 
+// Info on how to work with IndexedDB: 
+// https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
+
 // Initialise the database name independetly of how it is referred in specific browsers
 const indexedDB =
     window.indexedDB ||
@@ -61,22 +64,22 @@ request.onupgradeneeded = function () {
     store.createIndex("word_source_meaning", ["word_source"], { unique: false });
 };
 
-// request.onsuccess = function () {
-//     console.log("Database opened successfully");
-  
-//     const db = request.result;
-  
-//     // 1
-//     const transaction = db.transaction("words", "readwrite");
-  
-//     //2
-//     const store = transaction.objectStore("words");
-//     const word_source_meaning = store.index("word_source_meaning");
-  
+request.onsuccess = function () {
+    console.log("Database opened successfully");
+
+    const db = request.result;
+
+    // 1
+    const transaction = db.transaction("words", "readwrite");
+
+    //2
+    const store = transaction.objectStore("words");
+    const word_source_meaning = store.index("word_source_meaning");
+
 //     transaction.oncomplete = function () {
 //       db.close();
 //     };
-//   };
+  };
 
 function divideText() {
     // Initialise an empty list of words
@@ -103,9 +106,6 @@ function addWordsFromWordList() {
         var wordLi = document.createElement("li");
         wordLi.appendChild(document.createTextNode(`${word}`));
         unorderedList.appendChild(wordLi);
-        const db = request.result;
-        const transaction = db.transaction("words", "readwrite");
-        const store = transaction.objectStore("words");
         store.put({ word_source: word, word_target: "translation" });
     });
 }
