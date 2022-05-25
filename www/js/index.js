@@ -61,38 +61,22 @@ request.onupgradeneeded = function () {
     store.createIndex("word_source_meaning", ["word_source"], { unique: false });
 };
 
-request.onsuccess = function () {
-    console.log("Database opened successfully");
+// request.onsuccess = function () {
+//     console.log("Database opened successfully");
   
-    const db = request.result;
+//     const db = request.result;
   
-    // 1
-    const transaction = db.transaction("words", "readwrite");
+//     // 1
+//     const transaction = db.transaction("words", "readwrite");
   
-    //2
-    const store = transaction.objectStore("words");
-    const word_source_meaning = store.index("word_source");
+//     //2
+//     const store = transaction.objectStore("words");
+//     const word_source_meaning = store.index("word_source_meaning");
   
-    // const idQuery = store.get(4);
-    // const colourQuery = colourIndex.getAll(["Red"]);
-    // const colourMakeQuery = makeModelIndex.get(["Blue", "Honda"]);
-  
-    // 5
-    // idQuery.onsuccess = function () {
-    //   console.log('idQuery', idQuery.result);
-    // };
-    // colourQuery.onsuccess = function () {
-    //   console.log('colourQuery', colourQuery.result);
-    // };
-    // colourMakeQuery.onsuccess = function () {
-    //   console.log('colourMakeQuery', colourMakeQuery.result);
-    // };
-  
-    // 6
-    transaction.oncomplete = function () {
-      db.close();
-    };
-  };
+//     transaction.oncomplete = function () {
+//       db.close();
+//     };
+//   };
 
 function divideText() {
     // Initialise an empty list of words
@@ -119,6 +103,9 @@ function addWordsFromWordList() {
         var wordLi = document.createElement("li");
         wordLi.appendChild(document.createTextNode(`${word}`));
         unorderedList.appendChild(wordLi);
+        const db = request.result;
+        const transaction = db.transaction("words", "readwrite");
+        const store = transaction.objectStore("words");
         store.put({ word_source: word, word_target: "translation" });
     });
 }
