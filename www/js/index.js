@@ -31,59 +31,52 @@ function onDeviceReady() {
 // Info on how to work with IndexedDB: 
 // https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
 
-// Initialise the database name independetly of how it is referred in specific browsers
-const indexedDB =
-    window.indexedDB ||
-    window.mozIndexedDB ||
-    window.webkitIndexedDB ||
-    window.msIndexedDB ||
-    window.shimIndexedDB;
+// In the following line, you should include the prefixes of implementations you want to test.
+window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+// DON'T use "var indexedDB = ..." if you're not in a function.
+// Moreover, you may need references to some window.IDB* objects:
+window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || { READ_WRITE: "readwrite" }; // This line should only be needed if it is needed to support the object's constants for older browsers
+window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+// (Mozilla has never prefixed these objects, so we don't need window.mozIDB*)
 
-if (!indexedDB) {
-    console.log("IndexedDB could not be found in this browser.");
+if (!window.indexedDB) {
+    console.log("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.");
 }
 
 //Make an open request to the database version 1. The first parameter is the name of the database and second
 // parameter is the version
-const request = indexedDB.open("LexiqaDatabase", 1);
 
-request.onerror = function (event) {
-    console.error("An error occurred with IndexedDB");
-    console.error(event);
+var request = window.indexedDB.open("LexiqaDatabase", 1);
+
+var db;
+var request = indexedDB.open("MyTestDatabase");
+request.onerror = event => {
+    console.log("Why didn't you allow my web app to use IndexedDB?!");
+};
+request.onsuccess = event => {
+    db = event.target.result;
+};
+
+db.onerror = event => {
+    // Generic error handler for all errors targeted at this database's
+    // requests!
+    console.error("Database error: " + event.target.errorCode);
 };
 
 // Trigger the on upgrade event when a new database is created or a new version of the database is added
-request.onupgradeneeded = function () {
-    //1
-    const db = request.result;
+// This event is only implemented in recent browsers
+request.onupgradeneeded = event => {
+    // Save the IDBDatabase interface
+    var db = event.target.result;
 
-    //2
-    const store = db.createObjectStore("words", { keyPath: "id", autoIncrement: true });
-
-    //3
-    store.createIndex("word_source_meaning", ["word_source"], { unique: false });
+    // Create an objectStore for this database
+    var objectStore = db.createObjectStore("name", { keyPath: "myKey" });
 };
 
-request.onsuccess = function () {
-    console.log("Database opened successfully");
-
-    const db = request.result;
-
-    // 1
-    const transaction = db.transaction("words", "readwrite");
-
-    //2
-    const store = transaction.objectStore("words");
-    const word_source_meaning = store.index("word_source_meaning");
-
-//     transaction.oncomplete = function () {
-//       db.close();
-//     };
-  };
+// Initialise an empty list of words
+var wordList = [];
 
 function divideText() {
-    // Initialise an empty list of words
-    var wordList = [];
     // Get the value entered into the textbox
     var enteredText = $("#entered-text").val();
     // Split the entered text on empty spaces between words
@@ -106,6 +99,5 @@ function addWordsFromWordList() {
         var wordLi = document.createElement("li");
         wordLi.appendChild(document.createTextNode(`${word}`));
         unorderedList.appendChild(wordLi);
-        store.put({ word_source: word, word_target: "translation" });
     });
 }
